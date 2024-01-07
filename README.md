@@ -1,6 +1,7 @@
 # Transcendance
 
-Requirements: install docker
+Requirements:
+- Install docker
 
 How to install:
 - Compile with make: it will create a create all the necessaries inside a container containing 3 services : database, backend and frontend.
