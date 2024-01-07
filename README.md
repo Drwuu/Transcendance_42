@@ -1,4 +1,4 @@
-# Transcendance
+# Transcendence
 
 Requirements:
 - Install docker
