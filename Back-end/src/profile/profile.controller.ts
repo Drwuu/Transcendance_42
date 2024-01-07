@@ -223,8 +223,8 @@ export class ProfileController {
 		let user: UserProfile = await this.appService.getUserInfo(id);
 		let client: ClientState = await this.appService.getClientState(id);
 
-		if (user === undefined) {
-			return res.json({
+		if (!user) {
+			return res.status(404).json({
 				id: 0
 			}).end();
 		}

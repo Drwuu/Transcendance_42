@@ -48,13 +48,13 @@ export class game {
 		this._clock = new THREE.Clock();
 		this._delta = this._clock.getDelta();
 
-		this._settings = {ballSpeed:4, playerSize:15, fov:70, camHeight:200, backgroundColor:0xa0a0a0}
+		this._settings = {ballSpeed:0.5, playerSize:15, fov:70, camHeight:200, backgroundColor:0xa0a0a0}
 		this._logic = new logic(this._settings);
 
 		if (socketDatas.difficulty === 1)
 			this._difficulty = 0;
 		else
-			this._difficulty = 0.4;
+			this._difficulty = 0.1;
 
 		this._gameMap = new FBXLoader();
 		datas.score1 = 0;
@@ -109,6 +109,7 @@ export class game {
 	}
 
 	start(socket:Socket) {
+
 		var hemLight = new THREE.HemisphereLight( 0xffffff, 0xc3377a);
 		hemLight.position.set( -5, 10, -7.5 );
 		this._scene.add( hemLight );

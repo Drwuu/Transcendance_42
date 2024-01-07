@@ -14,6 +14,7 @@ import { GameGateway } from './game/game.gateway';
 // import { EngineConsumer } from './game/engine.service'; // update file name
 
 import { MatchmakingGateway } from './game/matchmaking.gateway';
+import { SafetyExceptionFilter } from './safety.exceptionfilter';
 
 @Module({
   // imports: [
@@ -27,7 +28,7 @@ import { MatchmakingGateway } from './game/matchmaking.gateway';
   // ],
   controllers: [AppController, LoginController, ProfileController],
   // providers: [AppService, ChatService, ChatGateway, GameService, GameGateway, MatchmakingGateway, EngineService, EngineConsumer],
-  providers: [AppService, ChatService, ChatGateway, GameService, GameGateway, MatchmakingGateway],
+  providers: [AppService, ChatService, ChatGateway, GameService, GameGateway, MatchmakingGateway, SafetyExceptionFilter],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

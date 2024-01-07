@@ -1,10 +1,7 @@
 all:	launch
 
-launch: update
+launch:
 	docker-compose up --build
-
-update:
-	git pull origin master
 
 stop:
 	docker-compose down

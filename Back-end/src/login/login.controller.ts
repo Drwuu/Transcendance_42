@@ -36,8 +36,8 @@ export class LoginController {
 	@Get('oauth')
 	async handle42OAuth(@Req() request: Request, @Res({ passthrough: true }) response: Response, @Query('code') code?: string): Promise<any> {
 		let resultingCookie;
-
-		try {
+		
+				try {
 			let cookie = request.cookies[this.appService.getSessionCookieName()];
 			let sess: AuthState = undefined;
 

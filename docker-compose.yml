@@ -21,6 +21,10 @@ services:
       context: ./Front-end
     env_file:
       - ./.front.env
+    volumes:
+      - type: bind
+        source: /root/portfolio/transcendance_42/Front-end/src
+        target: /data/src
     networks:
       - "front_network"
     ports:
@@ -44,6 +48,9 @@ services:
       - type: volume
         source: avatar_volume
         target: /data/avatar
+      - type: bind
+        source: /root/portfolio/transcendance_42/Back-end/src
+        target: /data/src
     networks:
       - "front_network"
       - "back_network"

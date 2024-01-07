@@ -13,15 +13,12 @@ export class logic {
 
 	static ballDirection(startGame:boolean, ball:Vector3, delta:number): Vector3 {
 		if (!startGame) {
-			settings.ballSpeed = 100;
 			logic._angle = 0;
-			// logic._ballDirection = new Vector3(tools.getRandom(0, 2),0,0);
 			logic._ballDirection = new Vector3(1,0,0);
 			ball.z = 0;
 			ball.x = 0;
 		}
 		else {
-			// ball.translateOnAxis(logic._ballDirection, settings.ballSpeed * delta);
 			ball.x = logic._ballDirection.x * settings.ballSpeed * (delta / 1000);
 			ball.z = logic._ballDirection.z * settings.ballSpeed * (delta / 1000);
 		}
@@ -32,24 +29,19 @@ export class logic {
 		// goal left
 		if (ball.x < -(ground / 2)) {
 			datas.score2++;
-			// document.querySelector("#score2")!.innerHTML = datas.score2.toString();
 			startGame = false;
 		}
 		// goal right
 		else if (ball.x > (ground / 2)) {
 			datas.score1++;
-			// document.querySelector("#score1")!.innerHTML = datas.score1.toString();
 			startGame = false;
 		}
 	}
 	 static checkBounce(ball:Vector3, ground:number) {
-		// if (ball.z > ground.mesh.geometry.boundingBox!.max.z
-		// || ball.z < ground.mesh.geometry.boundingBox!.min.z) {
 		if (ball.z > (ground / 2)
 		|| ball.z < -(ground / 2)) {
 			logic._angle *= -1;
 			logic._ballDirection.z = 1/180 * logic._angle;
-			// console.log('direction = ', logic._ballDirection.z);
 		}
 	}
 
@@ -59,14 +51,12 @@ export class logic {
 			left = false;
 		if (left) {
 			// player1
-			Logger.log('-(groundWidth / 2) + 10', -(groundWidth / 2) + 10)
 			if (ball.z > player1Z - settings.playerSize
 			&& ball.z < player1Z + settings.playerSize
 			&& ball.x < -(groundWidth / 2) + 10 ) {
 				logic._angle = logic.hitBall(ball, player1Z, 120);
 				logic._ballDirection = new Vector3(1, 0, 1/180 * logic._angle);
-				// console.log('logic._angle = ', logic._angle);
-				settings.ballSpeed += 10;
+				settings.ballSpeed += 0.5;
 			}
 		}
 		else {
@@ -76,8 +66,7 @@ export class logic {
 			&& ball.x > (groundWidth / 2) - 10) {
 				logic._angle = logic.hitBall(ball, player2Z, 120);
 				logic._ballDirection = new Vector3(-1, 0, 1/180 * logic._angle);
-				// console.log('logic._angle = ', logic._angle);
-				settings.ballSpeed += 10;
+				settings.ballSpeed += 0.5;
 			}
 		}
 	}

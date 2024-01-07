@@ -14,6 +14,8 @@ export class Emit { constructor(public givenBall : Position, public id : number,
 export class PendingClient { constructor(public id : number, public map : number, public diff : number) { } }
 
 export class Client {
+	private readonly logger: Logger = new Logger(Client.name);
+
 	private inGame : boolean = true;
 	private gameId : number = 0;
 	private spectate : boolean = false;
@@ -301,14 +303,13 @@ export class GameService {
 	///////////////// MATCHMAKING
 	// Game phase : searching, starting and end game session
 	async registerMatchmaking(appService : AppService, socket : Socket) {
-		this.logger.log(`[MATCHMAKING] New client -${socket.id}- connected.`);
+		this.logger.log(`[MATCHMAKING] New socket ${socket.id}`);
 		try {
 			var cookie : string = parse(socket.handshake.headers.cookie)[appService.getSessionCookieName()];
-			this.logger.warn(`COOKIE IS : ${cookie}`);
 			var state = await appService.getSessionDataToken(cookie);
 		}
 		catch {
-			this.logger.error(`[MATCHMAKING] Failed to authentify socket -${socket.id}-.`);
+			this.logger.error(`[MATCHMAKING] Failed to authentify socket ${socket.id}.`);
 			throw ExceptionSocketConnection('registerMatchmaking');
 		}
 		// If already registered, recreate it in Client List
@@ -316,18 +317,26 @@ export class GameService {
 		var clientSession : Client;
 		if (this.clientIDList.has(state.getId())) {
 			clientSession = this.clientIDList.get(state.getId());
+
+			let oldSocket = clientSession.getSocket;
+
 			clientSession.getSocket = socket;
+
 			this.clientList.set(socket.id, clientSession);
-			this.logger.log(`[MATCHMAKING] Client -${socket.id}- reconnected.`);
+			this.clientList.delete(oldSocket.id);
+
+			this.logger.log(`[MATCHMAKING] User ${clientSession.getId} reconnected: socket ${oldSocket.id} => ${socket.id}.`);
+
+			oldSocket.disconnect();
 		}
 		else {
 			clientSession = new Client(socket, true, state, 0, 0);
 			this.clientIDList.set(state.getId(), clientSession);
-			this.logger.log(`[MATCHMAKING] New client -${socket.id}- is registered.`);
+			this.logger.log(`[MATCHMAKING] User ${state.getId()} (${socket.id}) is registered.`);
 		}
 		this.clientList.set(socket.id, clientSession);
 		if (!socket.connected) {
-			this.logger.error(`[MATCHMAKING] Socket -${socket.id}- suddenly disconnect.`);
+			this.logger.error(`[MATCHMAKING] Socket ${state.getId()} (${socket.id}) suddenly disconnect.`);
 			throw ExceptionSocketConnection('registerFront');
 		}
 		appService.socketConnected(state.getId());
@@ -391,7 +400,7 @@ export class GameService {
 		this.clientCheck(opponent.getSocket, "inviteUser : opponent not properly registered.");
 
 		this.logger.log(`[MATCHMAKING] Client -${socket.id}- invited someone...`);
-
+		
 		var newGame = new GameSession(player, opponent);
 		// If the game is already registered, cancel process and return an error.
 		if (this.inviteList.has(newGame.getId)) {

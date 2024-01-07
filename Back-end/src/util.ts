@@ -16,7 +16,6 @@ export function isLocal(): boolean {
 
 export function getBackendHost(): string {
   let envHost = process.env.IP_SERVER;
-
   return envHost;
 }
 

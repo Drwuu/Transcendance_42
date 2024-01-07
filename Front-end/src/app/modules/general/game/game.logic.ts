@@ -6,7 +6,7 @@ import { datas } from './game.datas'
 import { controller } from './game.controller'
 import { Socket } from 'socket.io-client';
 
-const MAX_SPEED:number = 6;
+const MAX_SPEED:number = 15;
 const BALL_MARGIN:number = 4;
 
 export class logic {
@@ -42,7 +42,7 @@ export class logic {
 		// goal left
 		if (ball.mesh.position.x < ground.mesh.geometry.boundingBox!.min.x) {
 			socket.emit('scored', "player2");
-			this._ballSpeed = 4;
+			this._ballSpeed = 0.5;
 			this._angle = 0;
 			this._ballDirection = new THREE.Vector3(tools.getRandom(0, 2),0,0);
 			this.startGame = false;
@@ -52,7 +52,7 @@ export class logic {
 		// goal right
 		else if (ball.mesh.position.x > ground.mesh.geometry.boundingBox!.max.x) {
 			socket.emit('scored', "player1");
-			this._ballSpeed = 4;
+			this._ballSpeed = 0.5;
 			this._angle = 0;
 			this._ballDirection = new THREE.Vector3(tools.getRandom(0, 2),0,0);
 			this.startGame = false;
@@ -75,8 +75,10 @@ export class logic {
 		&& ball.mesh.position.x - BALL_MARGIN < player1.mesh.position.x) {
 			this._angle = this.hitBall(ball, player1, 120);
 			this._ballDirection = new THREE.Vector3(1, 0, 1/180 * this._angle);
-			if (this._ballSpeed < MAX_SPEED)
+			console.log("Ball Speed: " + this._ballSpeed);
+			if (this._ballSpeed < MAX_SPEED) {
 				this._ballSpeed += difficulty;
+			}
 			datas.combos++;
 			this.camEventCombos++;
 		}
@@ -108,7 +110,8 @@ export class logic {
 					return ;
 				controller.start.isOn = true;
 			}
-			if (controller.start.isOn && !this.startGame && isPlayer1 && ball.mesh.position.x == 0) {
+			if (controller.start.isOn && !this.startGame && isPlayer1
+			&& ball.mesh.position.x == 0) {
 				this.startGame = false;
 				socket.emit('throwBall');
 			}

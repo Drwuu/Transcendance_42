@@ -1,5 +1,5 @@
 export class settings {
-	static ballSpeed:number = 200;
+	static ballSpeed:number = 0.5;
 
 	static playerSize:number = 15;
 

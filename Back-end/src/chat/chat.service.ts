@@ -136,7 +136,7 @@ export class ChatRoom implements MessageReceipient {
 	private adminList: Set<number> = new Set();
 	private banList: Set<number> = new Set();
 
-	constructor(public readonly roomId: number, public readonly name: string, public readonly creator: number, private roomPrivate: boolean) {}
+	constructor(public readonly roomId: number, public readonly name: string, public readonly creator: number, private roomPrivate: boolean, public hasPassword: boolean) {}
 
 	setMembers(members: number[]) {
 		this.members.clear();
@@ -351,14 +351,14 @@ export class ChatService {
 	private rooms: Map<number, ChatRoom> = new Map();
 
 	constructor(private appService: AppService) {
-		this.rooms.set(GENERAL_ROOM_ID, new ChatRoom(GENERAL_ROOM_ID, GENERAL_ROOM_NAME, null, false));
+		this.rooms.set(GENERAL_ROOM_ID, new ChatRoom(GENERAL_ROOM_ID, GENERAL_ROOM_NAME, null, false, false));
 
 		new Promise(async () => {
 			let res = await this.appService.retrieveRoomList();
 
 			for (let r of res) {
 				this.logger.verbose(`LOADED ROOM ${r.id} (${r.name})`);
-				this.rooms.set(r.id, new ChatRoom(r.id, r.name, r.owner, r.isPrivate));
+				this.rooms.set(r.id, new ChatRoom(r.id, r.name, r.owner, r.isPrivate, r.hasPassword));
 
 				let members = await this.appService.getRoomMembers(r.id);
 				let admins = await this.appService.getRoomAdmins(r.id);
@@ -526,7 +526,7 @@ export class ChatService {
 		let timedout = false;
 
 		do {
-			roomId = -(Date.now() - 1653382357000);
+			roomId = -(Date.now() - 1653859650000);
 		} while (this.rooms.has(roomId) && !(timedout = (Date.now() - startTime) >= (2 /* s */ * 1000 /* ms */)));
 
 		if (timedout) {
@@ -535,7 +535,7 @@ export class ChatService {
 			return false;
 		}
 
-		let room: ChatRoom = new ChatRoom(roomId, name, client.getId(), type === "private");
+		let room: ChatRoom = new ChatRoom(roomId, name, client.getId(), type === "private", password !== undefined);
 		room.addUser(client, true);
 		this.rooms.set(room.getId(), room);
 
@@ -626,6 +626,7 @@ export class ChatService {
 
 		if (result) {
 			socket.emit("roomError", makeError(ChatResult.Ok), payload.roomId);
+			room.hasPassword = payload.password !== undefined;
 		} else {
 			socket.emit("roomError", makeError(ChatResult.UnknownError), payload.roomId);
 		}
@@ -657,7 +658,7 @@ export class ChatService {
 			return;
 		}
 
-		if (!(await this.appService.validateRoomPassword(room.getId(), payload.password))) {
+		if (room.hasPassword && !(await this.appService.validateRoomPassword(room.getId(), payload.password))) {
 			if (payload.password === undefined) {
 
 				if (room.isPrivate() && payload.toFind) {

@@ -17,194 +17,172 @@ const JWT_ISSUER: string = "ft_transcendance_BrindiSquad";
 const TOTP_MAX_DELTA = 1;
 
 export enum AuthStatus {
-  Inexistant,
-  Waiting,
-  Refused,
-  WaitingFor2FA,
-  Accepted,
-  AlreadyConnected,
+	Inexistant,
+	Waiting,
+	Refused,
+	WaitingFor2FA,
+	Accepted,
+	AlreadyConnected,
 }
 
 export enum UserStatus {
-  Offline,
-  Invisible,
-  Online,
-  InGame
+	Offline,
+	Invisible,
+	Online,
+	InGame
 }
 
 export class AuthState {
-  constructor(public authStatus: AuthStatus, public id?: number) {}
+	constructor(public authStatus: AuthStatus, public id?: number) {}
 }
 
 export class UserProfile {
-  constructor(
-    public login: string,
-    public readonly displayName: string,
-    public readonly defaultAvatarUrl: string,
-    public xp: number = 0,
-    public rank: string = "N00b",
-    public win: number = 0,
-    public loose: number = 0,
-    public totpSecret: OAuth.TOTP = undefined,
-    public hotpCounter: number = 0,
-  ) {}
+	constructor(
+		public login: string,
+		public readonly displayName: string,
+		public readonly defaultAvatarUrl: string,
+		public xp: number = 0,
+			public rank: string = "N00b",
+			public win: number = 0,
+			public loose: number = 0,
+			public totpSecret: OAuth.TOTP = undefined,
+	) {}
 }
 
 export class ClientState {
-  public totpInPreparation: boolean = false;
-  public socketCount: number = 0;
+	public totpInPreparation: boolean = false;
+	public socketCount: number = 0;
 
-  private friendList: Set<number> = new Set();
+	constructor(
+		private id: number,
+		public userStatus: UserStatus,
+		public profile: UserProfile,
+	) {}
 
-  constructor(
-    private id: number,
-    public userStatus: UserStatus,
-    public profile: UserProfile,
-  ) {}
+	public getId(): number {
+		return this.id;
+	}
 
-  public getId(): number {
-    return this.id;
-  }
-
-  public getDefaultAvatarUrl(): string {
-    return this.profile.defaultAvatarUrl;
-  }
-
-  public addFriend(friend: number) {
-    this.friendList.add(friend);
-  }
-
-  public removeFriend(friendId: number) {
-    this.friendList.delete(friendId);
-  }
-
-  public getFriendList(): number[] {
-    let result: number[] = [];
-
-    for (let f of this.friendList.keys()) {
-      result.push(f);
-    }
-
-    return result;
-  }
+	public getDefaultAvatarUrl(): string {
+		return this.profile.defaultAvatarUrl;
+	}
 }
 
 @Injectable()
 export class AppService {
-  private readonly logger: Logger = new Logger(AppService.name);
-  private secret: KeyObject;
+	private readonly logger: Logger = new Logger(AppService.name);
+	private secret: KeyObject;
 
-  private sqlConn: Client;
+	private sqlConn: Client;
 
-  private userMap: Map<number, ClientState> = new Map();
+	private userMap: Map<number, ClientState> = new Map();
 
-  public constructor() {
-    this.secret = generateKeySync("hmac", { length: 512 });
+	public constructor() {
+		this.secret = generateKeySync("hmac", { length: 512 });
 
-    if (!util.isLocal()) {
-      this.sqlConn = new Client({
-        host: process.env.IP_DATABASE,
-        port: Number.parseInt(process.env.PORT_DATABASE),
-        user: process.env.POSTGRES_USER,
-        password: "test_password",
-        database: process.env.POSTGRES_DB });
-      this.sqlConn.connect();
-    }
-  }
+		if (!util.isLocal()) {
+			this.sqlConn = new Client({
+				host: process.env.IP_DATABASE,
+				port: Number.parseInt(process.env.PORT_DATABASE),
+				user: process.env.POSTGRES_USER,
+				password: "test_password",
+				database: process.env.POSTGRES_DB });
+				this.sqlConn.connect();
+		}
+	}
 
-  async newToken(data: AuthState): Promise<string> {
-    let token = await new jose.SignJWT({
-      authStatus: data.authStatus,
-      id: data.id
-    })
-      .setProtectedHeader({alg: JWT_ALG})
-      .setIssuedAt()
-      .setIssuer(JWT_ISSUER)
-      // .setExpirationTime("2h")
-      .sign(this.secret);
+	async newToken(data: AuthState): Promise<string> {
+		let token = await new jose.SignJWT({
+			authStatus: data.authStatus,
+			id: data.id
+		})
+		.setProtectedHeader({alg: JWT_ALG})
+		.setIssuedAt()
+		.setIssuer(JWT_ISSUER)
+		.sign(this.secret);
 
-      return token.toString();
-  }
+		return token.toString();
+	}
 
-  async getInitialToken(): Promise<string> {
-    return await this.newToken({
-      authStatus: AuthStatus.Waiting
-    });
-  }
+	async getInitialToken(): Promise<string> {
+		return await this.newToken({
+			authStatus: AuthStatus.Waiting
+		});
+	}
 
-  async getSessionDataToken(token: string): Promise<ClientState> {
-    let tokenData: AuthState = await this.getTokenData(token);
+	async getSessionDataToken(token: string): Promise<ClientState> {
+		let tokenData: AuthState = await this.getTokenData(token);
 
-    await this.reviveUser(tokenData.id);
-    return this.userMap.get(tokenData.id);
-  }
+		await this.reviveUser(tokenData.id);
+		return this.userMap.get(tokenData.id);
+	}
 
-  async getSessionData(req: Request): Promise<ClientState> {
-    return this.getSessionDataToken(req.cookies[this.getSessionCookieName()]);
-  }
+	async getSessionData(req: Request): Promise<ClientState> {
+		return this.getSessionDataToken(req.cookies[this.getSessionCookieName()]);
+	}
 
-  async getTokenData(token: string): Promise<AuthState> {
-    try {
-      const { payload, protectedHeader } = await jose.jwtVerify(token, this.secret, {
-        algorithms: [ JWT_ALG ],
-        issuer: JWT_ISSUER,
-      });
+	async getTokenData(token: string): Promise<AuthState> {
+		try {
+			const { payload, protectedHeader } = await jose.jwtVerify(token, this.secret, {
+				algorithms: [ JWT_ALG ],
+				issuer: JWT_ISSUER,
+			});
 
-      return new AuthState(payload.authStatus as AuthStatus, payload.id as number);
-    } catch (reason) {
-      this.logger.warn("retrieveUserData: Could not read token: " + reason);
-    }
-  }
+			return new AuthState(payload.authStatus as AuthStatus, payload.id as number);
+		} catch (reason) {
+			this.logger.warn("retrieveUserData: Could not read token: " + reason);
+		}
+	}
 
-  async receiveOAuthCode(code: string): Promise<string> {
-    this.logger.debug(`Received oauth code ${code}`)
+	async receiveOAuthCode(code: string): Promise<string> {
+		this.logger.debug(`Received oauth code ${code}`)
 
-    let cookie: AuthState;
+		let cookie: AuthState;
 
-    try {
-      let token_result = await axios.post("https://api.intra.42.fr/oauth/token", {
-        grant_type: "authorization_code",
-        client_id: this.getAPIClientId(),
-        client_secret: this.getAPISecret(),
-        code: code,
-        redirect_uri: `https://${util.getBackendHost()}${util.getBackendPrefix()}/login/oauth`
-      });
+		try {
+			let token_result = await axios.post("https://api.intra.42.fr/oauth/token", {
+				grant_type: "authorization_code",
+				client_id: this.getAPIClientId(),
+				client_secret: this.getAPISecret(),
+				code: code,
+				redirect_uri: `https://${util.getBackendHost()}${util.getBackendPrefix()}/login/oauth`
+							});
 
-      let response = await axios.get(`https://api.intra.42.fr/v2/me?access_token=${token_result.data.access_token}`);
-      this.logger.verbose(`retrieveUserData: got status ${response.status} from api.intra.42.fr`);
+				let response = await axios.get(`https://api.intra.42.fr/v2/me?access_token=${token_result.data.access_token}`);
+					this.logger.verbose(`retrieveUserData: got status ${response.status} from api.intra.42.fr`);
 
-      // If we have the data but this function is still called, then the guy is waiting for 2FA
-      if (this.getClientState(response.data.id) !== undefined) {
-        if (this.getClientState(response.data.id).profile.totpSecret !== undefined) {
-          return await this.newToken(new AuthState(AuthStatus.WaitingFor2FA, response.data.id));
-        } else {
-          return await this.newToken(new AuthState(AuthStatus.Accepted, response.data.id));
-        }
-      }
+				// If we have the data but this function is still called, then the guy is waiting for 2FA
+				if (this.getClientState(response.data.id) !== undefined) {
+					if (this.getClientState(response.data.id).profile.totpSecret !== undefined) {
+						return await this.newToken(new AuthState(AuthStatus.WaitingFor2FA, response.data.id));
+					} else {
+						return await this.newToken(new AuthState(AuthStatus.Accepted, response.data.id));
+					}
+				}
 
-      let sqlResult: UserProfile = await this.getUserInfo(response.data.id);
-      let userProfile: UserProfile;
+				let sqlResult: UserProfile = await this.getUserInfo(response.data.id);
+				let userProfile: UserProfile;
 
 
-      if (sqlResult) {
-        userProfile = sqlResult;
-      } else {
-        let login: string = response.data.login;
-        let currLogin: string = login;
-        let currAdd: number = 0;
-        let available: boolean;
+				if (sqlResult) {
+					userProfile = sqlResult;
+				} else {
+					let login: string = response.data.login;
+					let currLogin: string = login;
+					let currAdd: number = 0;
+					let available: boolean;
 
-        while (!(available = await this.isNameAvailable(currLogin)) && currAdd < 10000) {
-          currLogin = login + (currAdd);
-          currAdd += 1;
-        }
+					while (!(available = await this.isNameAvailable(currLogin)) && currAdd < 10000) {
+						currLogin = login + (currAdd);
+						currAdd += 1;
+					}
 
-        if (!available) {
-          this.logger.error(`receiveOAuthCode: no available login found (WTF)`);
-          return await this.newToken(new AuthState(AuthStatus.Refused));
-        }
+					if (!available) {
+						this.logger.error(`receiveOAuthCode: no available login found (WTF)`);
+						return await this.newToken(new AuthState(AuthStatus.Refused));
+					}
 
-        userProfile = new UserProfile(response.data.login, response.data.displayname, response.data.image_url);
+					userProfile = new UserProfile(currLogin, response.data.displayname, response.data.image_url);
         await this.registerUser(response.data.id, userProfile);
       }
 
@@ -270,11 +248,13 @@ export class AppService {
   }
 
   getAPIClientId(): string {
-    return "3cf0f70b74141822d0e52fc4858b288427ab9e62f4892d7390827f265748bdd7";
+    // return "3cf0f70b74141822d0e52fc4858b288427ab9e62f4892d7390827f265748bdd7";
+    return "u-s4t2ud-a9b0494ebc554833ffa2b6845b6e910b4c7feba65faf78d465003f1de780fcb0";
   }
 
   getAPISecret(): string {
-    return "adbf532fb52a4f8e86c872a0658f0665a19f0876097cab6733f0cb9fb5a6b2e1";
+    // return "adbf532fb52a4f8e86c872a0658f0665a19f0876097cab6733f0cb9fb5a6b2e1";
+    return "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";
   }
 
   getSessionCookieName(): string {
@@ -286,7 +266,7 @@ export class AppService {
   }
 
   getMaxLoginLength(): number {
-    return 64;
+    return 8;
   }
 
   getAvatarUrl(user: number): string {
@@ -377,7 +357,7 @@ export class AppService {
     let valid: boolean = await this.check2FA(sess, token);
 
     if (valid) {
-      this.execSql("UPDATE users SET totpsecret = $1 WHERE uid = $2;", sess.profile.totpSecret, sess.getId());
+      this.execSql("UPDATE users SET totpsecret = $1 WHERE uid = $2;", sess.profile.totpSecret.toString(), sess.getId());
       sess.totpInPreparation = false;
       return true;
     } else {
@@ -402,14 +382,9 @@ export class AppService {
   async check2FA(sess: ClientState, token: string): Promise<boolean> {
     let result: number = sess.profile.totpSecret.validate({token: token});
 
-    this.logger.debug(`check2FA: TOKEN: ${token}, DELTA: ${result}`);
+    this.logger.debug(`check2FA: TOKEN: ${token}, DELTA: ${result} (expected: ${sess.profile.totpSecret.generate()})`);
 
     let valid = result != null && result <= TOTP_MAX_DELTA;
-
-    if (valid) {
-      sess.profile.hotpCounter += 1;
-      this.execSql("UPDATE users SET hotpcounter = $1 WHERE uid = $2;", [sess.getId(), sess.profile.hotpCounter]);
-    }
 
     return valid;
   }
@@ -420,22 +395,32 @@ export class AppService {
     sess.profile.totpSecret = undefined;
     sess.totpInPreparation = false;
 
-    this.execSql("UPDATE users SET totpsecret = 'NULL' WHERE uid = $1;", sess.getId());
+    this.execSql("UPDATE users SET totpsecret = NULL WHERE uid = $1;", sess.getId());
   }
 
-  addFriend(sess: ClientState, targetId: number): any {
+  async addFriend(sess: ClientState, targetId: number): Promise<any> {
     let target = this.getClientState(targetId);
 
     this.logger.debug(`addFriend: client ${sess.getId()} (${sess.profile.login}) added ${targetId} to their friends`);
 
-    if (target !== undefined) {
-      target.addFriend(sess.getId());
+    if (targetId === sess.getId()) {
+      return { error: "Can't add themself to friend list" };
     }
-
-    sess.addFriend(targetId);
 
     let id0 = Math.min(sess.getId(), targetId);
     let id1 = Math.max(sess.getId(), targetId);
+
+    try {
+      const req: string = "SELECT * FROM friendlist WHERE id_user1 = $1 AND id_user2 = $2";
+      let sqlResult = await this.sqlConn.query(req, [id0, id1]);
+
+      if (sqlResult.rowCount > 0) {
+        return { error: "Already friend" };
+      }
+
+    } catch (reason) {
+      this.logger.debug(`getUserInfo: error while database querying: ${reason}`);
+    }
 
     this.execSql("INSERT INTO friendlist (id_user1, id_user2) VALUES ($1, $2);", id0, id1);
 
@@ -447,15 +432,8 @@ export class AppService {
 
     this.logger.debug(`removeFriend: client ${sess.getId()} (${sess.profile.login}) removed ${targetId} to their friends`);
 
-    if (target !== undefined) {
-      target.removeFriend(sess.getId());
-    }
-
-
     let id0 = Math.min(sess.getId(), targetId);
     let id1 = Math.max(sess.getId(), targetId);
-
-    sess.removeFriend(targetId);
 
     this.execSql("DELETE FROM friendlist WHERE id_user1 = $1 AND id_user2 = $2;", id0, id1);
 
@@ -471,7 +449,7 @@ export class AppService {
       let friendPrf = await this.getUserInfo(fid);
       let state: ClientState = this.getClientState(fid);
 
-      let status: UserStatus = (state) ? state.userStatus : UserStatus.Offline;
+      let status: UserStatus = (!state || state.socketCount === 0) ? UserStatus.Offline : state.userStatus;
 
       friendList.push({
         id: fid,
@@ -571,7 +549,7 @@ export class AppService {
         result.push({
           otherId: otherId,
           versus: otherPrf.login,
-          status: (r.winner === userId) ? "Win" : "Losse",
+          status: (r.winner === userId) ? "Win" : "Loose",
           score: `${scoreCurrent} - ${scoreOther}`,
         })
       }
@@ -637,16 +615,16 @@ export class AppService {
     }
   }
 
-  async retrieveRoomList(): Promise<{name: string, id: number, isPrivate: boolean, owner: number}[]> {
+  async retrieveRoomList(): Promise<{name: string, id: number, isPrivate: boolean, owner: number, hasPassword: boolean}[]> {
     const req = "SELECT * FROM rooms";
 
     try {
       let sqlResult = await this.sqlConn.query(req);
 
-      let result: {name: string, id: number, isPrivate: boolean, owner: number}[] = [];
+      let result: {name: string, id: number, isPrivate: boolean, owner: number, hasPassword: boolean}[] = [];
 
       for (let row of sqlResult.rows) {
-        result.push({name: row.room_name, id: row.identifiant, isPrivate: row.description === "private", owner: row.owner_id});
+        result.push({name: row.room_name, id: row.identifiant, isPrivate: row.description === "private", owner: row.owner_id, hasPassword: row.room_password !== null});
       }
 
       return result;
@@ -742,16 +720,16 @@ export class AppService {
 
       let row = result.rows[0];
 
-      let hotpSecret = undefined;
+      let totpSecret = undefined;
 
-      if (row.totpsecret === null) {
-        hotpSecret = OAuth.URI.parse(result.rows[0]);
-        hotpSecret.counter = row.hotpcounter;
+      if (row.totpsecret !== null) {
+	this.logger.log(`getUserInfo: totpSecret: ${row.totpsecret}`);
+        totpSecret = OAuth.URI.parse(row.totpsecret);
       }
 
       return new UserProfile(
         row.login, row.displayName, row.profile_pic, row.level, row.rank, row.wins, row.losses,
-        hotpSecret, row.hotpcounter
+        totpSecret
       );
     } catch (reason) {
       this.logger.debug(`getUserInfo: error while database querying: ${reason}`);
@@ -784,23 +762,17 @@ export class AppService {
     return this.execSql(req, prf.login, prf.displayName, prf.defaultAvatarUrl, id);
   }
 
-  // async setLogin(id: number, newLogin: string): Promise<boolean> {
-  //   const req = "UPDATE users SET login = $1 WHERE uid = $2;";
-
-  //   return this.execSql(req, newLogin, id);
-  // }
-
   async setPassword(roomId: number, newPassword: string): Promise<boolean> {
     const req =  newPassword === undefined
-      ? "UPDATE rooms SET room_password = CRYPT($1, GEN_SALT('md5')) WHERE identifiant = $2;"
-      : "UPDATE rooms SET room_password = $1 WHERE identifiant = $2;";
+	  ? "UPDATE rooms SET room_password = $1 WHERE identifiant = $2;"
+      : "UPDATE rooms SET room_password = CRYPT($1, GEN_SALT('md5')) WHERE identifiant = $2;";
 
     if (newPassword === undefined) newPassword = null;
 
     return this.execSql(req, newPassword, roomId);
   }
 
-  async updateStats(userId: number, hasWon: boolean) {
+  async updateStats(userId: number, hasWon: boolean): Promise<boolean> {
     const reqProfiles = "UPDATE users SET wins = $2, losses = $3, level = $4 WHERE uid = $1;";
 
     let info = await this.getUserInfo(userId);
@@ -815,6 +787,18 @@ export class AppService {
 
     if (info.xp > (50 * 100)) {
       info.xp = (50 * 100);
+    }
+
+    try {
+      let sess = this.getClientState(userId);
+
+      if (sess) {
+        sess.profile.xp = info.xp;
+        sess.profile.win = info.win;
+        sess.profile.loose = info.loose;
+      }
+    } catch (reason) {
+      this.logger.error(`updateStats: could not update stats: ${reason}`);
     }
 
     return this.execSql(reqProfiles, userId, info.win, info.loose, info.xp);
@@ -844,17 +828,33 @@ export class AppService {
   }
 
   async gameEnded(ids: {p1: number, p2: number}, winner: number, scores: {score1: number, score2: number}): Promise<boolean> {
-    if (!await this.updateStats(ids.p1, ids.p1 === winner)
-    || !await this.updateStats(ids.p2, ids.p2 === winner)) {
+    try {
+      if (!await this.updateStats(ids.p1, ids.p1 === winner)
+      || !await this.updateStats(ids.p2, ids.p2 === winner)) {
+        return false;
+      }
+    } catch (reason) {
+      this.logger.error(`gameEnded: error while updating DB: ${reason}`);
       return false;
     }
+
+    // let client0 = this.getClientState(ids.p1);
+    // let client1 = this.getClientState(ids.p2);
+
+    // if (client0 !== undefined) {
+    // 	if (winner === client0.getId()) client0.profile.win += 1;
+    // 	else client0.profile.loose += 1;
+    // }
+
+    // if (client1 !== undefined) {
+    // 	if (winner === client1.getId()) client1.profile.win += 1;
+    // 	else client1.profile.loose += 1;
+    // }
 
     let id0  = Math.min(ids.p1, ids.p2);
     let id1  = Math.max(ids.p1, ids.p2);
     let score0 = (ids.p1 < ids.p2) ? scores.score1 : scores.score2;
     let score1 = (ids.p1 > ids.p2) ? scores.score1 : scores.score2;
-
-    this.logger.debug(`CCCCCCCCCCCC GAMEENDED CALLED id0: ${id0}, id1: ${id1}, score0: ${score0}, score1: ${score1}`);
 
     const req = "INSERT INTO matches_history (id_user1, score_user1, id_user2, score_user2, winner) VALUES ($1, $2, $3, $4, $5);";
 
