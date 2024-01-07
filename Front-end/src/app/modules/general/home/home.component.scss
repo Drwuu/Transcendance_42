@@ -1,0 +1,474 @@
+@import url('https://fonts.cdnfonts.com/css/games');
+@import url('https://fonts.googleapis.com/css?family=Press+Start+2P');
+
+::-webkit-scrollbar {
+    width: 0.1px;
+    height: 0.1px;
+}
+
+.flexx{
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	bottom: 0;
+}
+
+.modal-dialog {
+    max-width: 500px;
+    margin: 1.75rem auto;
+	position: relative;
+    width: auto;
+    margin: 0.5rem;
+    pointer-events: none;
+}
+
+.container_home{
+	display: flex;
+	width: 100%;
+	height: 88%;
+	padding: 1.5%;
+	flex-direction: column;
+	justify-content: space-evenly;
+	flex-wrap: wrap;
+	align-items: center;
+	margin-top: 2.5%;
+	@media screen and (max-height:800px){
+		height: 84%;
+		margin-top: 4%;
+	}
+}
+
+.app-pro{
+	display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: space-around;
+    align-items: center;
+	height: 100%;
+	width: 100%;
+}
+
+.aswer{
+	display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+}
+
+.stats{
+	background-color: #231E39;
+	border-radius: 5px;
+	box-shadow: 0px 10px 20px -10px rgba(0,0,0,0.55);
+	color: #B3B8CD;
+	padding-top: 10px;
+	position: relative;
+	width: 38%;
+	height: 100%;
+	max-width: 100%;
+	text-align: start;
+	padding-left: 10px;
+}
+
+.card-container {
+	background: rgb(34,193,195);
+	background-color: rgba(44, 4, 42, 0.70);
+	backdrop-filter: blur(5px);
+	border-radius: 5px;
+	box-shadow: 0px 10px 20px -10px rgba(0,0,0,0.75);
+	color: #B3B8CD;
+	padding: 1.5%;
+	position: relative;
+	width: 40%;
+	height: 100%;
+	max-width: 100%;
+	text-align: start;
+	flex-direction: row;
+}
+
+.profile{
+	padding: 0.70em;
+	width: 100%;
+	height: 100%;
+	display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.friends{
+	height: 45%;
+	margin-bottom: auto;
+}
+
+.container_profile{
+	height: 45%;
+	margin-bottom: auto;
+}
+
+.history-card{
+	height: 45%;
+}
+
+.content_profile{
+	padding: 2%;
+    background-color: transparent;
+    margin: 2px;
+	border-radius: 10px;
+    height: 100%;
+    width: 100%;
+}
+
+.history{
+	background-color: #4d226c;
+	color: whitesmoke;
+	display: flex;
+	flex-direction: row;
+	margin: 2% 1%;
+	border-radius: 10px;
+	box-shadow: 0px 10px 20px -10px rgba(0,0,0,0.75);
+	align-items: center;
+	justify-content: space-around;
+	width: auto;
+	#first-item-span{
+		margin-left: 1%;
+	}
+	span{
+		width: 20%;
+	}
+}
+
+.list_history{
+	width: 100%;
+	height: 100%;
+}
+
+.game-launch{
+	width: 85%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	align-content: space-around;
+	justify-content: space-evenly;
+	align-items: center;
+	button{
+		height: auto;
+		width: auto;
+		margin-left: 0.5%;
+		margin-right: 0.5%;
+	}
+	div{
+		flex-wrap: nowrap;
+		margin: 0.5%;
+	}
+}
+
+#img_map{
+	width: 120px;
+	height: 90px;
+}
+.game-div{
+	width: 100%;
+	display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.card-container .round .stats{
+	border: 1px solid #03BFCB;
+	border-radius: 50%;
+	padding: 7px;
+}
+
+.list_friends{
+	padding: 2%;
+	background-color: transparent;
+	margin: 2px;
+	border-radius: 10px;
+	height: 100%;
+    width: 100%;
+}
+
+.selected{
+	border-color: gold !important;
+	border-width: 2.5px!important;
+}
+
+.user{
+	background-color: #4d226c;
+	color: whitesmoke;
+	display: flex;
+	flex-direction: row;
+	margin: 2% 1%;
+	border-radius: 10px;
+	box-shadow: 0px 10px 20px -10px rgba(0,0,0,0.75);
+	align-items: center;
+	justify-content:space-between;
+	width: auto;
+	#first-item-span{
+		margin-left: 1%;
+	}
+	span{
+		width: 20%;
+	}
+}
+
+.btn-success{
+	background-color: blueviolet !important;
+	border-radius: 10px;
+}
+
+.btn-start{
+		box-shadow: 0px 0px 10px #be1dde, 0px 0px 10px #be1dde, inset 0px 0px 10px #be1dde, inset 0px 0px 10px #be1dde;
+}
+
+#battle{
+	background-color: rgb(111, 48, 199) !important;
+	border-radius: 10px;
+	width: auto !important;
+}
+
+.card-game{
+	width: 55%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	align-content: flex-start;
+	flex-wrap: nowrap;
+	justify-content: space-around;
+}
+
+.span-game{
+	color: thistle;
+	font-size: 16px;
+	font-family: 'Games', sans-serif;
+}
+
+#choose-map{
+	width: 100%;
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: stretch;
+    justify-content: center;
+}
+
+/*************************************************/
+/******************** animation color ************/
+/*************************************************/
+
+
+.textemulticolore{
+	background-image: linear-gradient(
+		to left,
+		yellow,
+		orange
+	);
+	-webkit-background-clip: text;
+	-webkit-background-clip: text;
+	-moz-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.btn-start{
+		box-shadow: 0px 0px 10px #be1dde, 0px 0px 10px #be1dde, inset 0px 0px 10px #be1dde, inset 0px 0px 10px #be1dde;
+
+}
+
+.no-select{
+	-webkit-touch-callout: none;
+	  -webkit-user-select: none;
+	   -khtml-user-select: none;
+		 -moz-user-select: none;
+		  -ms-user-select: none;
+			  user-select: none;
+		  -webkit-tap-highlight-color: transparent;
+  }
+
+.button-retro{
+	width: auto;
+	height: auto;
+	margin: 5px;
+	cursor: pointer;
+	background: rgb(111, 48, 199);
+	border: none;
+	border-radius: 10px;
+	box-shadow: 0px 0px 10px #be1dde, 0px 0px 10px #be1dde, inset 0px 0px 10px #be1dde, inset 0px 0px 10px #be1dde;
+	color: white;
+	font-size: 13px;
+	transition: 500ms;
+  }
+
+  .button-retro:hover {
+	animation: hueRotation 5s linear infinite;
+  }
+
+  @keyframes hueRotation {
+	  to {filter: hue-rotate(360deg);}
+  }
+
+  button:focus {
+	  outline: none;
+  }
+
+
+  /************** border ****************/
+
+
+@mixin step1( $width, $color ) {
+	box-shadow:
+	  $width 0 $color,
+	  -$width 0 $color,
+	  0 (-$width) $color,
+	  0 $width $color;
+	margin: $width auto;
+  }
+
+
+@mixin step2v2( $width, $color, $bgcolor ) {
+	box-shadow:
+	  $width 0 $bgcolor,
+	  -$width 0 $bgcolor,
+	  0 (-$width) $bgcolor,
+	  0 $width $bgcolor,
+	  2*$width 0 $color,
+	  -2*$width 0 $color,
+	  0 (-2*$width) $color,
+	  0 2*$width $color,
+	  0 0 0 $width $color;
+	margin: 2*$width auto;
+  }
+
+
+@mixin step3v2( $width, $color, $bgcolor ) {
+	box-shadow:
+	  $width 0 $bgcolor,
+	  -$width 0 $bgcolor,
+	  0 (-$width) $bgcolor,
+	  0 $width $bgcolor,
+	  2*$width 0 $bgcolor,
+	  -2*$width 0 $bgcolor,
+	  0 (-2*$width) $bgcolor,
+	  0 2*$width $bgcolor,
+	  0 0 0 $width $bgcolor,
+	  3*$width 0 $color,
+	  -3*$width 0 $color,
+	  0 3*$width $color,
+	  0 (-3*$width) $color,
+	  0 (-$width) 0 $width $color,
+	  0 $width 0 $width $color,
+	  $width 0 0 $width $color,
+	  -$width 0 0 $width $color;
+	margin: 3*$width auto;
+  }
+  @mixin step4( $width, $color, $bgcolor ) {
+	box-shadow:
+	  $width 0 $bgcolor,
+	  -$width 0 $bgcolor,
+	  0 (-$width) $bgcolor,
+	  0 $width $bgcolor,
+	  2*$width 0 $bgcolor,
+	  -2*$width 0 $bgcolor,
+	  0 (-2*$width) $bgcolor,
+	  0 2*$width $bgcolor,
+	  0 0 0 $width $bgcolor,
+	  3*$width 0 $bgcolor,
+	  -3*$width 0 $bgcolor,
+	  0 3*$width $bgcolor,
+	  0 (-3*$width) $bgcolor,
+	  0 (-$width) 0 $width $bgcolor,
+	  0 $width 0 $width $bgcolor,
+	  $width 0 0 $width $bgcolor,
+	  -$width 0 0 $width $bgcolor,
+	  4*$width 0 $color,
+	  -4*$width 0 $color,
+	  0 (-4*$width) $color,
+	  0 4*$width $color,
+	  2*$width 0 0 $width $color,
+	  -2*$width 0 0 $width $color,
+	  0 2*$width 0 $width $color,
+	  0 (-2*$width) 0 $width $color,
+	  0 0 0 2*$width $color;
+	  margin: 4*$width auto;
+  }
+  @mixin other( $width, $color, $bgcolor ) {
+	box-shadow:
+	  4*$width 0 $bgcolor,
+	  -4*$width 0 $bgcolor,
+	  0 (-4*$width) $bgcolor,
+	  0 4*$width $bgcolor,
+	  $width 0 0 2*$width $bgcolor,
+	  -$width 0 0 2*$width $bgcolor,
+	  0 (-$width) 0 2*$width $bgcolor,
+	  0 $width 0 2*$width $bgcolor,
+	  5*$width 0 $color,
+	  -5*$width 0 $color,
+	  0 (-5*$width) $color,
+	  0 5*$width $color,
+	  0 0 0 3*$width $color,
+	  0 2*$width 0 2*$width $color,
+	  0 (-2*$width) 0 2*$width $color,
+	  2*$width 0 0 2*$width $color,
+	  (-2*$width) 0 0 2*$width $color;
+	  margin: 5*$width auto;
+  }
+  .lvl1 {
+	@include other( 4px, orange, white );
+  }
+  .lvl2 {
+	@include step2v2( 4px, blue, white );
+  }
+  .lvl3 {
+	@include step3v2( 3px, red, white );
+  }
+  .lvl4 {
+	@include step4( 5px, #4924b1, #7b02cd );
+  }
+  .other {
+	@include step1( 6px, rgb(97, 16, 144) );
+  }
+
+
+  /************************/
+
+  @import url('https://fonts.googleapis.com/css?family=Raleway:200');
+
+.gradient-border {
+	padding: 2%;
+  --borderWidth: 3px;
+  background: #1D1F20;
+  position: relative;
+  border-radius: var(--borderWidth);
+  width: 100%;
+}
+.gradient-border:after {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--borderWidth));
+  left: calc(-1 * var(--borderWidth));
+  height: calc(100% + var(--borderWidth) * 2);
+  width: calc(100% + var(--borderWidth) * 2);
+  background: linear-gradient(60deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
+  border-radius: calc(2 * var(--borderWidth));
+  z-index: -1;
+  animation: animatedgradient 3s ease alternate infinite;
+  background-size: 300% 300%;
+}
+
+
+@keyframes animatedgradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}

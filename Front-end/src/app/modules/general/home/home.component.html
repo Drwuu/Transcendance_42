@@ -1,0 +1,126 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Damion&display=swap" rel="stylesheet">
+
+<app-header></app-header>
+
+<div class="flexx">
+
+  <div *ngIf="get_invited===true then invite else dashboard"></div>
+  <ng-template #invite>
+    <div class="container_home">
+      <div class="card-container" style="width: 40%; height: 15%; padding: 0;">
+        <div class="content_profile">
+          <div class="gradient-border">
+            <div class="show_invite">
+              <h1>{{invited_name}} invites you to play</h1>
+              <div class="aswer">
+                <button class="btn btn-lg btn-primary" (click)="answer(1)"> Accept</button>
+                <button class="btn btn-lg btn-danger" (click)="answer(2)"> Refuse</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #dashboard>
+
+    <div class="container_home">
+      <div class="card-container container_profile">
+        <div class="content_profile">
+
+          <div *ngIf="show_profil=='true' then Profil else Wait"></div>
+          <ng-template #Profil>
+            <div class="profile gradient-border">
+              <app-profile class="app-pro"></app-profile>
+            </div>
+          </ng-template>
+          <ng-template #Wait>
+            <div class="profile gradient-border">
+              <div class="app-pro">
+                <div class="spinner-border text-light" role="status"></div>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="card-container history-card">
+      <div class="game-launch gradient-border">
+          <div class="game-div">
+            <span class="span-game ">Difficulty Games</span> <button class=" btn btn-sm btn-success btn-speed {{selec_normal}}" (click)="select_dif(1)">Normal</button><button class="btn btn-sm btn-success btn-speed {{selec_hard}}" (click)="select_dif(2)">Hard</button>
+          </div>
+          <div id="choose-map" class="game-div">
+            <div class="game-div">
+              <button class="btn btn-success btn-sm btn-arrow-map" (click)="chose_map(-1)"><img src="../../../../assets/img/left-arrow.png"></button> <span class="span-game ">Select Map</span> <button class=" btn btn-success btn-sm btn-arrow-map" (click)="chose_map(1)"> <img src="../../../../assets/img/arrow-right.png"></button>
+            </div>
+            <div *ngIf="show_map===1 then M1 else M2"></div>
+            <ng-template #M1>
+              <img src="../../../../assets/img/004.jpeg" alt="" id="img_map">
+            </ng-template>
+            <ng-template #M2>
+              <div *ngIf="show_map===2 then M2 else M3"></div>
+              <ng-template #M2>
+                <img src="../../../../assets/img/005.jpeg" alt="" id="img_map">
+              </ng-template>
+              <ng-template #M3>
+                <img src="../../../../assets/img/zyro-image00.png" alt="" id="img_map">
+              </ng-template>
+            </ng-template>
+          </div>
+          <div class="game-div">
+            <button class="btn btn-success btn-sm btn-start" (click)="start_matchmaking()"  ><img src="../../../../assets/img/computer-game.png">  Fight     <img src="../../../../assets/img/computer-game.png"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-container friends">
+        <div class="list_friends">
+          <div class="gradient-border" style="height: 100%;">
+            <div class="gradient-border" style="height: 100%; overflow:scroll; overflow-x:hidden;">
+              <h3>Friend List</h3>
+              <app-friends [items]="listItems" style="height: 100%;">
+                <ng-template let-item="$implicit" let-i="index" style="height: 100%;">
+                  <li class="user">
+                    <span id="first-item-span" (click)="go_profile(listItems[i].id)" style="cursor: pointer;"> {{listItems[i].login}} </span> <span> level {{listItems[i].level}}</span> <span>status {{listItems[i].userStatus}} </span>
+                    <div *ngIf="listItems[i].userStatus=='InGame' then spec"></div>
+                    <ng-template #spec>
+                      <button id="battle" class="btn btn-sm btn-success" (click)="go_spectate(listItems[i].id)" >Spectate<img src="../../../../assets/img/spectated.png" alt="glass" > </button>
+                    </ng-template>
+                    <div *ngIf="listItems[i].userStatus=='Online' then invite"></div>
+                    <ng-template #invite>
+                      <button id="battle" class="btn btn-sm btn-success" (click)="init_invite(listItems[i])" >Battle <img src="../../../../assets/img/axe.png" alt="axe" > </button> <button class="btn btn-success btn-sm" (click)="Send_msg_Friendlist(listItems[i])">Send Message <img src="../../../../assets/img/send.png"></button><button class="btn btn-success btn-sm" (click)="Remove_Friendlist(listItems[i].id)" >Remove<img src="../../../../assets/img/x.png"></button>
+                    </ng-template>
+                  </li>
+                </ng-template>
+              </app-friends>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-container history-card">
+        <div class="list_history">
+          <div class="gradient-border" style="height: 100%;">
+            <div class="gradient-border" style="overflow:scroll; overflow-x:hidden; height: 100%;">
+              <h3>History</h3>
+              <app-history [items]="listHystory">
+                <ng-template let-item="$implicit" let-i="index">
+                  <li class="history">
+                    <span id="first-item-span"> {{listHystory[i].versus}} </span> <span>{{listHystory[i].score}} </span>  <span>status <span>{{listHystory[i].status}}</span></span>
+                  </li>
+                </ng-template>
+              </app-history>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-template>
+
+</div>
+
+<app-footer></app-footer>

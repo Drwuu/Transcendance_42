@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/sbaranes/Training-trancendance'
+git pull origin master
+docker-compose up --build
+make: Leaving directory '/home/sbaranes/Training-trancendance'
+ 

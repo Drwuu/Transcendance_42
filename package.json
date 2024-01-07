@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@popperjs/core": "^2.11.5",
+    "three": "^0.140.2"
+  },
+  "devDependencies": {
+    "@types/three": "^0.140.0"
+  }
+}

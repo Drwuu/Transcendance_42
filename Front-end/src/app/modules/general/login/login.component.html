@@ -1,0 +1,25 @@
+<div class="Login-form">
+  <h1 class="title" >Ft_Trancendence</h1>
+  <div *ngIf="show_login=='true' then Login else Process"></div>
+  <ng-template #Login>
+    <button ng-template #log id="log_button" (click)="Process_oauth()">Login</button>
+  </ng-template>
+  <ng-template #Process>
+    <div *ngIf="show_Auth=='true' then Auth else Wait"></div>
+    <ng-template #Auth>
+      <div class="input_form">
+        <input type="text" id="codeSecret" name="codeSecret" [(ngModel)]="codeSecret" placeholder="Enter your code Authentificator" style="float: left;">
+        <button ng-template #log class="btn btn-sm btn-secondary"  type="button" (click)="VerifCode()">Send</button>
+      </div>
+      <div *ngIf="badcode=='true' then error else nothing"></div>
+        <ng-template #error>
+            <p style="color: brown;">Error bad code, Try again</p>
+        </ng-template>
+        <ng-template #nothing> </ng-template>
+    </ng-template>
+    <ng-template #Wait>
+      <div class="spinner-border text-light" role="status"></div>
+    </ng-template>
+  </ng-template>
+
+</div>

@@ -1,0 +1,20 @@
+<div class="profile-pages">
+
+	<div class="profil-body">
+		<div class="profile-img">
+			<img class="round" [src]="GetImageUrl()" alt="user"/>
+		</div>
+		<div class="profile-info">
+			<p>Login : {{data['login']}}</p>
+			<p>Id : {{data['id']}}</p>
+			<p>Win : {{data['win']}}</p>
+			<button class="btn btn-sm btn-secondary" (click)="GoProfile()">view profile</button>
+		</div>
+		<div class="profile-stats">
+			<p>Ratio : {{data['ratio']}}</p>
+			<p>Level : {{data['level']}}</p>
+			<p>Loose : {{data['loose']}}</p>
+		</div>
+	</div>
+
+</div>

@@ -1,0 +1,123 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Damion&display=swap" rel="stylesheet">
+
+<div class="profile-pages">
+
+	<app-header></app-header>
+
+	<div class="profile-body">
+			<div class="info_profile card-container">
+				<div class="gradient-border profile-inside">
+				<div *ngIf="show_profil=='true' then Profil else Wait"></div>
+				<ng-template #Profil>
+					<div class="profile-imgg">
+						<img class="roundd" style="width: 45%;" [src]="GetImageUrl()" alt="user"/>
+						<br>
+					<!-- </div> -->
+						<div class="change_avatar">
+							<div *ngIf=" show_file=='true' then img_load else img_load2"></div>
+							<ng-template #img_load>
+								<input type="file" class="btn btn-sm btn-secondary btn-choose-img" (change)="onFileSelected($event)">
+							<button class="btn btn-sm btn-secondary" (click)="sendFile()">Submit</button>
+							<button class="btn btn-sm btn-secondary" (click)="ResetFile()">Reset</button>
+							</ng-template>
+							<ng-template #img_load2>
+								<button class="btn btn-sm btn-secondary" type="submit" style="margin-top: 3%; width: 38%;" (click)="ProcessImgChange()">Change Avatar</button>
+							</ng-template>
+						</div>
+
+						<div class="change_log">
+							<div *ngIf=" show_login=='true' then show_input_login else show_login_button"></div>
+							<ng-template #show_input_login>
+								<div class="change_login">
+									<input type="text" id="username" name="username" [(ngModel)]="username" style="float: left;">
+									<button ng-template #log class="btn btn-sm btn-secondary"  type="button" (click)="ProcessLogchange()">Send</button>
+								</div>
+								<div *ngIf=" file_validator=='true' then accepte else refused"></div>
+									<ng-template #accepte>
+									</ng-template>
+									<ng-template #refused>
+										<p style="color: brown;">Error: Login already used, or you need to have less than 10 characters. Login can't be null.</p>
+									</ng-template>
+							</ng-template>
+							<ng-template #show_login_button>
+									<button class="btn btn-sm btn-secondary" style="margin-top: 3%;" (click)="ProcessLogchange()" >Change Login </button>
+							</ng-template>
+						</div>
+
+					</div>
+				<div class="setting">
+					<div id="dbauth">
+						<h6>Double Auth</h6>
+						<div class="activate_DbAuth">
+							<div *ngIf=" show_DbAuth=='true' then Db_Auth_false else Db_Auth_true"></div>
+							<ng-template #Db_Auth_false>
+
+								<div *ngIf=" show_DbAuth_Activated=='true' then Db_Auth_Activated else Db_Auth_Init"></div>
+								<ng-template #Db_Auth_Activated>
+									<button class="btn btn-sm btn-danger" type="submit" style="margin-top: 3%;" (click)="Db_Auth_Deactivate()">Deactivate</button>
+								</ng-template>
+								<ng-template #Db_Auth_Init>
+									<qr-code [value]="Code_Auth_recv" [size]="125" [level]="'L'" ></qr-code>
+									<div class="process_DbAuth">
+										<div class="Auth">
+											<input type="text" id="Input_Auth_User" name="Input_Auth_User" [(ngModel)]="Input_Auth_User" placeholder="Enter Code" style="margin-top: 3%; float: left;">
+											<button ng-template #log class="btn btn-sm btn-secondary" type="button" style="margin-top: 3%;" (click)="SendStringAuth()">Send Code</button>
+										</div>
+										<button class="btn btn-sm btn-danger" type="submit" style="margin-top: 2%;" (click)="Db_Auth_process_cancel()">cancel</button>
+									</div>
+									<div *ngIf=" show_error=='true' then db_auth_erro else Db_Auth_no_error"></div>
+									<ng-template #db_auth_erro>
+										<p style="color: brown;">Error code invalide.</p>
+									</ng-template>
+									<ng-template #Db_Auth_no_error></ng-template>
+								</ng-template>
+
+							</ng-template>
+							<ng-template #Db_Auth_true>
+								<button class="btn btn-sm btn-success" type="submit" style="margin-top: 3%;" (click)="Db_Auth_states()">Activate</button>
+							</ng-template>
+						</div>
+
+
+					</div>
+				</div>
+				<div class="profil-container-info">
+						<div class="profile-info">
+							<p>Login : {{data['login']}}</p>
+							<p>Id : {{data['id']}}</p>
+							<p>Win : {{data['win']}}</p>
+						</div>
+					<div class="profile-stats">
+						<p>Ratio : {{data['ratio']}}</p>
+						<p>Level : {{data['level']}}</p>
+						<p>Loose : {{data['loose']}}</p>
+					</div>
+				</div>
+				</ng-template>
+			<ng-template #Wait>
+				<div class="spinner-border text-light" role="status"></div>
+			</ng-template>
+				</div>
+			</div>
+			<div class="info_game card-container">
+				<div class="list_history">
+					<div class="gradient-border">
+					  <div class="gradient-border" style="overflow:scroll; overflow-x:hidden;">
+						<h3>History</h3>
+						<app-history [items]="listHistory">
+						  <ng-template let-item="$implicit" let-i="index">
+							<li class="history">
+							  <span id="first-item-span"> {{listHistory[i].versus}} </span> <span>{{listHistory[i].score}} </span> <span>status <span>{{listHistory[i].status}}</span></span>
+							</li>
+						  </ng-template>
+						</app-history>
+					  </div>
+					</div>
+				  </div>
+			</div>
+	</div>
+
+	<app-footer></app-footer>
+</div>

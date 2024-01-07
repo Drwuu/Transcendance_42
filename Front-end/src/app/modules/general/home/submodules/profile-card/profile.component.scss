@@ -1,0 +1,35 @@
+
+.profil-body{
+	display: flex;
+	justify-content: space-around;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+}
+
+.round{
+	float: left;
+	padding: 5px;
+	border-radius: 100%;
+	width: 100%;
+}
+
+.profile-img{
+	width: 20%;
+	height: auto;
+}
+
+.profile-info{
+	width: 30%;
+	height: 70%;
+}
+
+.profile-stats{
+	width: 30%;
+	height: 70%;
+	p{
+		margin-left: 10%;
+	}
+}

@@ -1,0 +1,43 @@
+<div class="body_game">
+	<div class="header">
+		<span id="scorePlayer1"> PLAYER1 SCORE : <span id="score1">0</span></span>
+		<span id="scorePlayer2"> PLAYER2 SCORE : <span id="score2">0</span></span>
+	</div>
+
+	<div *ngIf="ShowGame=='true' then game else end_game"></div>
+	<ng-template #game>
+		<canvas #canvas id="canvas"></canvas>
+	</ng-template>
+	<ng-template #end_game>
+		<div class="container_home">
+			<div class="card-container" style="width: 40%; height: 15%; padding: 0;">
+				<div class="content_profile">
+					<div class="gradient-border">
+						<div class="show_invite">
+
+							<div *ngIf="ShowWin=='true' then Win else IsSpectate"></div>
+							<ng-template #Win>
+								<span id="end">You win</span>
+							</ng-template>
+
+							<ng-template #IsSpectate>
+								<div *ngIf="ShowSpectate=='true' then Spectate else Loose"></div>
+								<ng-template #Spectate>
+									<span id="end">Stream ended</span>
+								</ng-template>
+
+								<ng-template #Loose>
+									<span id="end">You lose</span>
+								</ng-template>
+							</ng-template>
+
+							<div class="aswer">
+								<button class="btn btn-lg btn-secondary btn-return" (click)="return_home()"> Return to Home </button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</ng-template>
+</div>

@@ -1,0 +1,66 @@
+version: "3.9"
+
+networks:
+  front_network:
+    driver: bridge
+  back_network:
+    driver: bridge
+
+volumes:
+  db_volume:
+  avatar_volume:
+
+
+services:
+
+  frontend:
+    container_name: frontend
+    depends_on:
+      - backend
+    build:
+      context: ./Front-end
+    env_file:
+      - ./.front.env
+    networks:
+      - "front_network"
+    ports:
+      - 443:4200
+    restart: always
+
+  backend:
+    container_name: backend
+    depends_on:
+      - database
+    build:
+      context: ./Back-end
+    environment:
+      POSTGRES_USER: backend
+      VOLUME_AVATAR_PATH: /data/avatar
+      VOLUME_AVATAR_NAME: avatar_volume
+    env_file:
+      - ./.front.env
+      - ./.db.env
+    volumes:
+      - type: volume
+        source: avatar_volume
+        target: /data/avatar
+    networks:
+      - "front_network"
+      - "back_network"
+    restart: always
+
+  database:
+    build:
+      context: ./database
+    container_name: database
+    env_file:
+      - ./.db.env
+    environment:
+      VOLUME_DB_NAME: db_volume
+      VOLUME_DB_PATH: /var/lib/postgresql/data
+    volumes:
+      - type: volume
+        source: db_volume
+        target: /var/lib/postgresql/data
+    networks:
+      - "back_network"

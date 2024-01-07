@@ -1,0 +1,55 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Damion&display=swap" rel="stylesheet">
+
+<div class="profile-pages">
+
+	<app-header></app-header>
+
+	<div class="profile-body">
+			<div class="info_profile card-container">
+				<div class="gradient-border profile-inside">
+				<div *ngIf="show_profil=='true' then Profil else Wait"></div>
+				<ng-template #Profil>
+					<div class="profile-imgg">
+						<img class="roundd" style="width: 45%;" [src]="GetImageUrl()" alt="user"/>
+					</div>
+
+				<div class="profil-container-info">
+						<div class="profile-info">
+							<p>Login : {{data['login']}}</p>
+							<p>Id : {{data['id']}}</p>
+							<p>Win : {{data['win']}}</p>
+						</div>
+					<div class="profile-stats">
+						<p>Ratio : {{data['ratio']}}</p>
+						<p>Level : {{data['level']}}</p>
+						<p>Loose : {{data['loose']}}</p>
+					</div>
+				</div>
+
+				</ng-template>
+			<ng-template #Wait>
+				<div class="spinner-border text-light" role="status"></div>
+			</ng-template>
+				</div>
+			</div>
+			<div class="info_game card-container">
+				<div class="list_history">
+					<div class="gradient-border">
+					  <div class="gradient-border" style="overflow:scroll; overflow-x:hidden;">
+						<h3>History</h3>
+						<app-history [items]="listHistory">
+						  <ng-template let-item="$implicit" let-i="index">
+							<li class="history">
+							  <span id="first-item-span"> {{listHistory[i].versus}} </span> <span>{{listHistory[i].score}} </span> <span>status <span>{{listHistory[i].status}}</span></span>
+							</li>
+						  </ng-template>
+						</app-history>
+					  </div>
+					</div>
+				  </div>
+			</div>
+	</div>
+	<app-footer></app-footer>
+</div>

@@ -1,0 +1,227 @@
+<footer class="nga-footer fixed-bottom">
+	<div class="footer-basic">
+	  <footer>
+
+		<div ngbDropdown class="dropup" style="margin: 0; padding: 0;">
+			<div *ngIf="zbla=='true' then ChaTt"></div>
+			<ng-template #ChaTt>
+			<button type="button" class="btn btn-primary button-chat" id="dropdownConfig" (click)="reset_chat()" ngbDropdownToggle>Chat</button>
+			<div ngbDropdownMenu aria-labelledby="dropdownConfig" style="padding: 0%; border-width:0px; background-color: transparent;">
+
+				<div *ngIf="show_btn=='true' then btn else cansel"></div>
+				<ng-template #btn>
+					<button class="btn btn-primary" style="bottom: 453px;" (click)="Show_create_room()">Add Room</button>
+					<button class="btn btn-primary" style="bottom: 453px;" (click)="Show_join_room()">Join Room</button>
+					<button class="btn btn-warning" style="bottom: 453px;" (click)="Show_help()">Help</button>
+				</ng-template>
+				<ng-template #cansel>
+					<button class="btn btn-danger" style="bottom: 453px;" (click)="create_room_cancel()">Cancel</button>
+				</ng-template>
+
+					<div *ngIf="show_chat=='true' then Chat else Create_room"></div>
+
+					<ng-template #Chat>
+
+					<div class="chat-div" style=" margin-left: 2px;">
+						<div class="chat-list">
+							<div class="gradient-border" style="width: 100%; height: 100%;">
+								<div class="nav flex-column nav-pills me-3" style="height: 100%; overflow:scroll; padding-right: 8px;" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+									<app-chats [items]="ListConvo">
+										<ng-template let-item="$implicit" let-i="index">
+											<div *ngIf="ListConvo[i].roomId <= 0 then chan else conv"></div>
+											<ng-template #chan>
+												<li class="user-list">
+													<button class="nav-link active" style="background-color: rgb(246, 149, 4) !important;" type="button" (click)="set_chan(ListConvo[i], i)">{{ListConvo[i].name}}</button>
+												</li>
+											</ng-template>
+											<ng-template #conv>
+												<li class="user-list">
+													<button class="nav-link active" type="button" (click)="set_chan(ListConvo[i], i)">{{ListConvo[i].name}}</button>
+												</li>
+											</ng-template>
+										</ng-template>
+									</app-chats>
+								</div>
+							</div>
+						</div>
+						<div class="chat-convo">
+							<div class="gradient-border" style="width: 100%; height: 100%;">
+
+								<div class="convo">
+
+									<app-chats [items]="Convo.tabmsg" id="app-chats">
+										<ng-template let-item="$implicit" let-i="index">
+											<div class="area-message">
+													<div *ngIf="Convo.tabmsg[i].from=='me' then me else other"></div>
+													<ng-template #me >
+														<div class="message msg-right">
+															<p><span>{{Convo.tabmsg[i].msg}} </span> </p>
+														</div>
+													</ng-template>
+													<ng-template #other>
+													<div *ngIf="Convo.tabmsg[i].from=='other' then good else error"></div>
+													<ng-template #good>
+														<div class="message">
+															<p> <span> {{Convo.tabmsg[i].sender}} ({{Convo.tabmsg[i].senderId}}) </span></p>
+															<p> <span> {{Convo.tabmsg[i].msg}} </span></p>
+														</div>
+													</ng-template>
+													<ng-template #error>
+														<div class="message msg-error">
+															<p> <span> <em> {{Convo.tabmsg[i].msg}} </em> </span></p>
+														</div>
+													</ng-template>
+												</ng-template>
+											</div>
+										</ng-template>
+									</app-chats>
+									<div class="input_msg">
+										<input id="input_msg" type="text" name="msginput" [(ngModel)]="msg_to_send" placeholder="Enter your message" (keyup)="$event.keyCode == 13 ? send_msg(Convo.roomId) : null" style="float: left;">
+										<button ng-template #log class="btn btn-sm btn-secondary"  type="button"  (click)="send_msg(Convo.roomId)" >Send</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</ng-template>
+
+				<ng-template #Create_room>
+
+					<div *ngIf="create_or_join=='create' then Create else Join"></div>
+
+					<ng-template #Create>
+						<div class="room-div" style=" margin-left: 2px;">
+							<div class="gradient-border" style="width: 100%; height: 100%;">
+							<div class="form_room">
+									<div>
+										<span>Name Of The Room</span>
+										<input id="name_room" type="text" name="name_room" [(ngModel)]="name_room" placeholder="Enter name room (15 caracter max)">
+									</div>
+									<div>
+										<span>Type Of The Room</span>
+										<button class="btn btn-secondary btn-sm {{selec_public}}" (click)="selec_type(1)">Public</button>
+										<button class="btn btn-secondary btn-sm {{selec_private}}" (click)="selec_type(2)">Private</button>
+									</div>
+
+									<div>
+										<span>Whan Set Password</span>
+										<button class="btn btn-secondary btn-sm {{selec_no}}" (click)="selec_pwsd(1)">no</button>
+										<button class="btn btn-secondary btn-sm {{selec_yes}}" (click)="selec_pwsd(2)">yes</button>
+										<div *ngIf="ask_pswd=='yes' then show_input"></div>
+										<ng-template #show_input>
+											<input id="key_room" type="password" name="key_room" [(ngModel)]="key_room" placeholder="Set password room">
+										</ng-template>
+									</div>
+									<div>
+										<button class="btn btn-sm btn-secondary" type="button" (click)="ask_create_room()">Create your Room</button>
+									</div>
+									<div>
+										<div *ngIf="show_er_room=='true' then ERR else noname"></div>
+										<ng-template #ERR>
+											<p style="color: brown;">The Name can't have more than 15 caracters and (., ,\, /,*,-) are not alowed.</p>
+										</ng-template>
+										<ng-template #noname>
+											<div *ngIf="show_er_room=='noname' then ERRR"></div>
+											<ng-template #ERRR>
+												<p style="color: brown;">You can't create a room without name.</p>
+											</ng-template>
+										</ng-template>
+									</div>
+
+							</div>
+							</div>
+						</div>
+					</ng-template>
+
+					<ng-template #Join>
+						<div *ngIf="create_or_join=='join' then Join2 else help"></div>
+
+						<ng-template #Join2>
+
+						<div class="room-div" style=" margin-left: 2px;">
+							<div class="gradient-border" style="overflow:scroll; overflow-x:hidden; height: 100%;" style="width: 100%; height: 100%;">
+								<div class="join_list">
+									<app-chan-list [items]="list_to_join" id="app-chan-list" style="height: 100%; overflow:scroll;">
+										<ng-template let-item="$implicit" let-i="index">
+											<div class="list_waiting">
+												<button class="btn btn-sm btn-primary btn_list_to_join"  (click)="remove_chan_wait(list_to_join[i], list_to_join[i].roomId)" >{{list_to_join[i].name}}</button>
+											</div>
+										</ng-template>
+									</app-chan-list>
+									<div *ngIf="need_key=='true' then ask_key"></div>
+									<ng-template #ask_key>
+										<div style="width: 100%; display: flex; justify-content: center;">
+											<input id="key_room" type="password" name="key_room" style="width: auto;" [(ngModel)]="key_room_enter" (keyup)="$event.keyCode == 13 ? send_key_room() : null" placeholder="Enter key room">
+											<button class="btn btn-sm btn-secondary" type="button" style="width: auto;" (click)="send_key_room()">Join</button>
+										</div>
+										<div *ngIf="bad_key=='true' then bad"></div>
+										<ng-template #bad>
+											<div>
+												<p style="color: brown;">Bad Password.</p>
+											</div>
+										</ng-template>
+									</ng-template>
+									<div style="width: 100%; display: flex; justify-content: center;">
+										<input id="sarch_private" type="text" name="sarch_private" [(ngModel)]="name_room_private" style="width: 50%;" (keyup)="$event.keyCode == 13 ? find_private_room() : null" placeholder="Enter id Room">
+										<button class="btn btn-sm btn-secondary" type="button" style="width: auto;" (click)="find_private_room()">Find Room</button>
+									</div>
+									<div *ngIf="not_exist=='true' then Ero"></div>
+									<ng-template #Ero>
+										<div *ngIf="er=='true' then Eroo else Erox"></div>
+										<ng-template #Erox>
+											<div>
+												<p style="color: brown;">This Room not exist.</p>
+											</div>
+										</ng-template>
+										<ng-template #Eroo>
+											<div>
+												<p style="color: brown;">You are banned from dis Room.</p>
+											</div>
+										</ng-template>
+									</ng-template>
+								</div>
+							</div>
+						</div>
+					</ng-template>
+				</ng-template>
+
+				<ng-template #help>
+					<div class="room-div-help" style=" margin-left: 2px;">
+						<div class="gradient-border" style="overflow:scroll; overflow-x:hidden; height: 100%;" style="width: 100%; height: 100%;">
+							<div class="help_list">
+								<h3>Users Cmd</h3>
+								<p> <span id="cmd">cmd</span> /id : <span id="cmd_do"> Show the id of the room or of the User</span></p>
+								<p> <span id="cmd">cmd</span> /game < id > : <span id="cmd_do"> Invite the User to play a game</span></p>
+								<p> <span id="cmd">cmd</span> /friend < id > : <span id="cmd_do"> Add user id to fyour friend list</span></p>
+								<p> <span id="cmd">cmd</span> /profile < id > : <span id="cmd_do">Show the profile of the id</span></p>
+								<p> <span id="cmd">cmd</span> /block < id > : <span id="cmd_do">block the id, you will not recev this message from any channel</span></p>
+								<p> <span id="cmd">cmd</span> /unblock < id > : <span id="cmd_do">unblock the id.</span></p>
+								<h3>Channels Cmd (Administrator Channel Only)</h3>
+								<p> <span id="cmd">cmd</span> /add_admin < id > : <span id="cmd_do">Give to the id admin rights</span></p>
+								<p> <span id="cmd">cmd</span> /del_admin < id > : <span id="cmd_do">Remove to the id admin rights</span></p>
+								<p> <span id="cmd">cmd</span> /leave : <span id="cmd_do">Leave the Room</span></p>
+								<p> <span id="cmd">cmd</span> /pwd < new_password > : <span id="cmd_do">Set password or change it if he alredy exist</span></p>
+								<p> <span id="cmd">cmd</span> /pwd_unset : <span id="cmd_do"> Remove password from the channel</span></p>
+								<p> <span id="cmd">cmd</span> /mute < id > < time > : <span id="cmd_do"> Mute the User of id for X time </span></p>
+								<p> <span id="cmd">cmd</span> /unmute < id > : <span id="cmd_do"> Unmute the User of id </span></p>
+								<p> <span id="cmd">cmd</span> /ban < id > : <span id="cmd_do">Ban the id from the channel</span></p>
+								<p> <span id="cmd">cmd</span> /unban < id >: <span id="cmd_do">Unban the id from the channel</span></p>
+								<p> <span id="cmd">cmd</span> /kick < id >: <span id="cmd_do">kick the id from the channel</span></p>
+							</div>
+						</div>
+					</div>
+				</ng-template>
+
+				</ng-template>
+
+			</div>
+		</ng-template>
+		</div>
+		<div class="social">
+		  <a href="https://www.instagram.com/42lyonauvergnerhonealpes/?hl=fr" target="_blank"><i class="icon ion-social-instagram"></i></a><a href="https://twitter.com/42Lyon" target="_blank"><i class="icon ion-social-twitter"></i></a><a href="https://github.com/sach1095/Training-trancendance" target="_blank"><i class="icon ion-social-github"></i></a>
+		</div>
+		<p class="copyright">© 2022 Team Ft_Trancendence School 42 Lyon - All right reserved - Created by Sbaranes, Faherrau, Clsaad, Lwourms et Guhernan</p>
+
+	</footer>
+	</div>
+</footer>
