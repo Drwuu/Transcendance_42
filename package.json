@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "@nestjs/common": "^10.3.0",
     "@popperjs/core": "^2.11.5",
+    "express": "^4.18.2",
+    "nestjs": "^0.0.1",
     "three": "^0.140.2"
   },
   "devDependencies": {
