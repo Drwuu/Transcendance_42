@@ -4,7 +4,7 @@ Requirements:
 - Install docker
 
 How to install:
-- Compile with make: it will create a create all the necessaries inside a container containing 3 services : database, backend and frontend.
+- Compile with make: it will create all the necessaries inside a container containing 3 services : database, backend and frontend.
 - Connect on https://localhost
 - You must have a 42 account to play as part of the project was to use the 42 API
 
